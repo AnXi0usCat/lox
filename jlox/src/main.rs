@@ -1,7 +1,4 @@
-use std::{env, error::Error};
-
-mod repl;
-use crate::repl::start_repl;
+use std::{env, error::Error, fs, io::{self, stdout, BufRead, Write}};
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -15,7 +12,7 @@ fn main() {
             std::process::exit(1);
         }
     } else {
-        if let Err(e) = start_repl() {
+        if let Err(e) = run_prompt() {
             eprintln!("Error starting repl {}", e);
             std::process::exit(1);
         }
@@ -23,6 +20,32 @@ fn main() {
 }
 
 fn run_file(path: &str) -> Result<(), Box<dyn Error>> {
+    let input = fs::read_to_string(path)?;
+    run(&input)?;
+    Ok(())
+}
+
+pub fn run_prompt() -> Result<(), Box<dyn Error>> {
+    let stdin = io::stdin();
+    let mut handle = stdin.lock();
+
+    loop {
+        println!("> ");
+        stdout().flush()?;
+
+        let mut buffer = String::new();
+        let bytes_read = handle.read_line(&mut buffer)?;
+
+        if bytes_read == 0 {
+            break;
+        }
+
+        run(&buffer)?;
+    }
+    Ok(())
+}
+
+fn run(input: &str) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
