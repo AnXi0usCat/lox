@@ -30,7 +30,7 @@ fn run_file(path: &str) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-pub fn run_prompt() -> Result<(), Box<dyn Error>> {
+fn run_prompt() -> Result<(), Box<dyn Error>> {
     let stdin = io::stdin();
     let mut handle = stdin.lock();
 
