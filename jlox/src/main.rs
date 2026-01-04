@@ -1,4 +1,9 @@
-use std::{env, error::Error, fs, io::{self, stdout, BufRead, Write}};
+use std::{
+    env,
+    error::Error,
+    fs,
+    io::{self, BufRead, Write, stdout},
+};
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -48,4 +53,3 @@ pub fn run_prompt() -> Result<(), Box<dyn Error>> {
 fn run(input: &str) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
-
