@@ -1,9 +1,13 @@
+mod scanner;
+
 use std::{
     env,
     error::Error,
     fs,
     io::{self, BufRead, Write, stdout},
 };
+
+use scanner::Scanner;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -26,7 +30,10 @@ fn main() {
 
 fn run_file(path: &str) -> Result<(), Box<dyn Error>> {
     let input = fs::read_to_string(path)?;
-    run(&input)?;
+    if let Err(e) = run(&input) {
+        eprintln!("Error executing program {e}");
+        std::process::exit(65);
+    };
     Ok(())
 }
 
@@ -45,11 +52,19 @@ fn run_prompt() -> Result<(), Box<dyn Error>> {
             break;
         }
 
-        run(&buffer)?;
+        if let Err(e) = run(&buffer) {
+            eprintln!("Error executing program {e}");
+        };
     }
     Ok(())
 }
 
 fn run(input: &str) -> Result<(), Box<dyn Error>> {
+    let mut scanner = Scanner::new(input);
+    let tokens = scanner.scan_tokens();
+
+    for token in tokens.iter() {
+        println!("{}", token);
+    }
     Ok(())
 }
