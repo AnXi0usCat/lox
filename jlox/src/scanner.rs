@@ -41,6 +41,8 @@ impl<'a> Scanner<'a> {
         if self.source[self.current] as char != expected {
             return false;
         }
+        self.current += 1;
+
         true
     }
 
