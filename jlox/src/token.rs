@@ -103,22 +103,35 @@ impl Display for TokenType {
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct Token {
+pub struct Token<'a> {
     pub token_type: TokenType,
-    pub lexeme: String,
+    pub lexeme: &'a [u8],
     pub literal: Option<String>,
     pub line: usize,
 }
 
-impl Display for Token {
+impl<'a> Display for Token<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self.literal {
             Some(ref val) => write!(
                 f,
                 "{}",
-                format!("[{} {} {}]", self.token_type, self.lexeme, val)
+                format!(
+                    "[{} {} {}]",
+                    self.token_type,
+                    str::from_utf8(self.lexeme).expect("Invalid UTF-8"),
+                    val
+                )
             ),
-            None => write!(f, "{}", format!("[{} {}]", self.token_type, self.lexeme)),
+            None => write!(
+                f,
+                "{}",
+                format!(
+                    "[{} {}]",
+                    self.token_type,
+                    str::from_utf8(self.lexeme).expect("Invalid UTF-8")
+                )
+            ),
         }
     }
 }

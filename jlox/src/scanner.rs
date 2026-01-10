@@ -3,7 +3,7 @@ use crate::token::{Token, TokenType};
 #[derive(Debug, Clone, PartialEq)]
 pub struct Scanner<'a> {
     source: &'a [u8],
-    tokens: Vec<Token>,
+    tokens: Vec<Token<'a>>,
     start: usize,
     current: usize,
     line: usize,
@@ -51,20 +51,20 @@ impl<'a> Scanner<'a> {
         let token_bytes = &self.source[self.start..self.current];
         self.tokens.push(Token {
             token_type,
-            lexeme: str::from_utf8(token_bytes).expect("Invalid UTF-8").into(),
+            lexeme: token_bytes,
             literal,
             line: self.line,
         });
     }
 
-    pub fn scan_tokens(&mut self) -> Vec<Token> {
+    pub fn scan_tokens(&mut self) -> Vec<Token<'a>> {
         while !self.is_at_end() {
             self.start = self.current;
             self.scan_token();
         }
         self.tokens.push(Token {
             token_type: TokenType::Eof,
-            lexeme: "".into(),
+            lexeme: "".as_bytes(),
             literal: None,
             line: self.line,
         });
