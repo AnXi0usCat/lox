@@ -33,6 +33,17 @@ impl<'a> Scanner<'a> {
         previous
     }
 
+    fn match_next(&mut self, expected: char) -> bool {
+        if self.is_at_end() {
+            return false;
+        }
+
+        if self.source[self.current] as char != expected {
+            return false;
+        }
+        true
+    }
+
     fn scan_token(&mut self) {
         match *self.advance() as char {
             '(' => self.add_token(TokenType::LeftParen, None),
@@ -44,6 +55,34 @@ impl<'a> Scanner<'a> {
             '+' => self.add_token(TokenType::Plus, None),
             ';' => self.add_token(TokenType::Semicolon, None),
             '*' => self.add_token(TokenType::Star, None),
+            '!' => {
+                if self.match_next('=') {
+                    self.add_token(TokenType::BangEqual, None)
+                } else {
+                    self.add_token(TokenType::Bang, None)
+                }
+            }
+            '=' => {
+                if self.match_next('=') {
+                    self.add_token(TokenType::EqualEqual, None)
+                } else {
+                    self.add_token(TokenType::Equal, None)
+                }
+            }
+            '<' => {
+                if self.match_next('=') {
+                    self.add_token(TokenType::LessEqual, None)
+                } else {
+                    self.add_token(TokenType::Equal, None)
+                }
+            }
+            '>' => {
+                if self.match_next('=') {
+                    self.add_token(TokenType::GreaterEqual, None)
+                } else {
+                    self.add_token(TokenType::Equal, None)
+                }
+            }
             _ => println!("Unexpected character"),
         }
     }
