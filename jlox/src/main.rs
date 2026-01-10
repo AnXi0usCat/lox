@@ -1,5 +1,3 @@
-mod scanner;
-
 use std::{
     env,
     error::Error,
@@ -7,7 +5,7 @@ use std::{
     io::{self, BufRead, Write, stdout},
 };
 
-use scanner::Scanner;
+use jlox::scanner::Scanner;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
