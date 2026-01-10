@@ -5,6 +5,8 @@ pub enum TokenType {
     // Single-character tokens.
     LeftBrace,
     RightBrace,
+    LeftParen,
+    RightParen,
     Comma,
     Dot,
     Minus,
@@ -54,6 +56,8 @@ impl Display for TokenType {
             // Single-character tokens
             Self::LeftBrace => "{",
             Self::RightBrace => "}",
+            Self::LeftParen => "(",
+            Self::RightParen => ")",
             Self::Comma => ",",
             Self::Dot => ".",
             Self::Minus => "-",
@@ -100,10 +104,10 @@ impl Display for TokenType {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Token {
-    token_type: TokenType,
-    lexeme: String,
-    literal: Option<String>,
-    line: usize,
+    pub token_type: TokenType,
+    pub lexeme: String,
+    pub literal: Option<String>,
+    pub line: usize,
 }
 
 impl Display for Token {
