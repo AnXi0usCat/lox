@@ -28,8 +28,9 @@ impl<'a> Scanner<'a> {
     }
 
     fn advance(&mut self) -> &u8 {
+        let previous = &self.source[self.current];
         self.current += 1;
-        &self.source[self.current]
+        previous
     }
 
     fn scan_token(&mut self) {
