@@ -56,32 +56,36 @@ impl<'a> Scanner<'a> {
             ';' => self.add_token(TokenType::Semicolon, None),
             '*' => self.add_token(TokenType::Star, None),
             '!' => {
-                if self.match_next('=') {
-                    self.add_token(TokenType::BangEqual, None)
+                let token_type = if self.match_next('=') {
+                    TokenType::BangEqual
                 } else {
-                    self.add_token(TokenType::Bang, None)
-                }
+                    TokenType::Bang
+                };
+                self.add_token(token_type, None);
             }
             '=' => {
-                if self.match_next('=') {
-                    self.add_token(TokenType::EqualEqual, None)
+                let token_type = if self.match_next('=') {
+                    TokenType::EqualEqual
                 } else {
-                    self.add_token(TokenType::Equal, None)
-                }
+                    TokenType::Equal
+                };
+                self.add_token(token_type, None);
             }
             '<' => {
-                if self.match_next('=') {
-                    self.add_token(TokenType::LessEqual, None)
+                let token_type = if self.match_next('=') {
+                    TokenType::LessEqual
                 } else {
-                    self.add_token(TokenType::Equal, None)
-                }
+                    TokenType::Equal
+                };
+                self.add_token(token_type, None);
             }
             '>' => {
-                if self.match_next('=') {
-                    self.add_token(TokenType::GreaterEqual, None)
+                let token_type = if self.match_next('=') {
+                    TokenType::GreaterEqual
                 } else {
-                    self.add_token(TokenType::Equal, None)
-                }
+                    TokenType::Equal
+                };
+                self.add_token(token_type, None);
             }
             _ => println!("Unexpected character"),
         }
