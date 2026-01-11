@@ -88,7 +88,8 @@ impl<'a> Scanner<'a> {
                     TokenType::Equal
                 };
                 self.add_token(token_type, None);
-            }
+            },
+            ' ' | '\t' | '\r' => (),
             _ => println!("Unexpected character"),
         }
     }
