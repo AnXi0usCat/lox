@@ -59,7 +59,7 @@ fn run_prompt() -> Result<(), Box<dyn Error>> {
 
 fn run(input: &str) -> Result<(), Box<dyn Error>> {
     let mut scanner = Scanner::new(input);
-    let tokens = scanner.scan_tokens();
+    let tokens = scanner.scan_tokens()?;
 
     for token in tokens.iter() {
         println!("{}", token);
