@@ -1,3 +1,6 @@
+use std::error::Error;
+
+use crate::error::UnterminatedStringError;
 use crate::token::{Token, TokenType};
 
 #[derive(Debug, Clone, PartialEq)]
@@ -53,7 +56,33 @@ impl<'a> Scanner<'a> {
         &self.source[self.current]
     }
 
-    fn scan_token(&mut self) {
+    fn string(&mut self) -> Result<(), Box<dyn Error>> {
+        while self.peek() != &('"' as u8) && !self.is_at_end() {
+            if self.peek() == &('\n' as u8) {
+                self.line += 1;
+            }
+            self.advance();
+        }
+
+        if self.is_at_end() {
+            return Err(Box::new(UnterminatedStringError(format!(
+                "Unterminated string on line: {}",
+                self.line
+            ))));
+        }
+
+        _ = self.advance();
+        // trim quotes
+        let value = &self.source[self.start + 1..self.current - 1];
+        self.add_token(
+            TokenType::String,
+            Some(String::from(str::from_utf8(value).expect("Invalid UTF-8"))),
+        );
+
+        Ok(())
+    }
+
+    fn scan_token(&mut self) -> Result<(), Box<dyn Error>> {
         match *self.advance() as char {
             '(' => self.add_token(TokenType::LeftParen, None),
             ')' => self.add_token(TokenType::RightParen, None),
@@ -95,7 +124,7 @@ impl<'a> Scanner<'a> {
                     TokenType::Equal
                 };
                 self.add_token(token_type, None);
-            },
+            }
             ' ' | '\t' | '\r' => (),
             '/' => {
                 if self.match_next('/') {
@@ -106,8 +135,10 @@ impl<'a> Scanner<'a> {
                     self.add_token(TokenType::Slash, None);
                 }
             }
+            '"' => self.string()?,
             _ => println!("Unexpected character on line {}", self.line),
         }
+        Ok(())
     }
 
     pub fn add_token(&mut self, token_type: TokenType, literal: Option<String>) {
@@ -120,10 +151,10 @@ impl<'a> Scanner<'a> {
         });
     }
 
-    pub fn scan_tokens(&mut self) -> Vec<Token<'a>> {
+    pub fn scan_tokens(&mut self) -> Result<Vec<Token<'a>>, Box<dyn Error>> {
         while !self.is_at_end() {
             self.start = self.current;
-            self.scan_token();
+            self.scan_token()?;
         }
         self.tokens.push(Token {
             token_type: TokenType::Eof,
@@ -131,6 +162,6 @@ impl<'a> Scanner<'a> {
             literal: None,
             line: self.line,
         });
-        self.tokens.clone()
+        Ok(self.tokens.clone())
     }
 }
