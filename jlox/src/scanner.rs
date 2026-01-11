@@ -46,6 +46,13 @@ impl<'a> Scanner<'a> {
         true
     }
 
+    fn peek(&self) -> &u8 {
+        if self.is_at_end() {
+            return &('\0' as u8);
+        }
+        &self.source[self.current]
+    }
+
     fn scan_token(&mut self) {
         match *self.advance() as char {
             '(' => self.add_token(TokenType::LeftParen, None),
@@ -90,6 +97,15 @@ impl<'a> Scanner<'a> {
                 self.add_token(token_type, None);
             },
             ' ' | '\t' | '\r' => (),
+            '/' => {
+                if self.match_next('/') {
+                    while self.peek() != &('\n' as u8) && !self.is_at_end() {
+                        self.advance();
+                    }
+                } else {
+                    self.add_token(TokenType::Slash, None);
+                }
+            }
             _ => println!("Unexpected character on line {}", self.line),
         }
     }
