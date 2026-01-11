@@ -1,0 +1,12 @@
+use std::{error::Error, fmt::Display};
+
+#[derive(Debug)]
+pub struct UnterminatedStringError(pub String);
+
+impl Error for UnterminatedStringError {}
+
+impl Display for UnterminatedStringError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
