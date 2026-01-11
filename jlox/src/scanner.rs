@@ -90,7 +90,7 @@ impl<'a> Scanner<'a> {
                 self.add_token(token_type, None);
             },
             ' ' | '\t' | '\r' => (),
-            _ => println!("Unexpected character"),
+            _ => println!("Unexpected character on line {}", self.line),
         }
     }
 
