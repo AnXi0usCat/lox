@@ -50,6 +50,30 @@ pub enum TokenType {
     Eof,
 }
 
+impl TokenType {
+    pub fn identifier(literal: &str) -> Self {
+        match literal {
+            "and" => Self::And,
+            "class" => Self::Class,
+            "else" => Self::Else,
+            "false" => Self::False,
+            "for" => Self::For,
+            "fun" => Self::Fun,
+            "if" => Self::If,
+            "nil" => Self::Nil,
+            "or" => Self::Or,
+            "print" => Self::Print,
+            "return" => Self::Return,
+            "super" => Self::Super,
+            "this" => Self::This,
+            "true" => Self::True,
+            "var" => Self::Var,
+            "while" => Self::While,
+            _ => Self::Identifier,
+        }
+    }
+}
+
 impl Display for TokenType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let name = match self {
