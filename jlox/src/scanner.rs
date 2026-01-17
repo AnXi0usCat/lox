@@ -49,16 +49,45 @@ impl<'a> Scanner<'a> {
         true
     }
 
-    fn peek(&self) -> &u8 {
+    fn peek(&self) -> u8 {
         if self.is_at_end() {
-            return &('\0' as u8);
+            return '\0' as u8;
         }
-        &self.source[self.current]
+        self.source[self.current]
+    }
+
+    fn peek_next(&self) -> u8 {
+        if self.current + 1 >= self.source.len() {
+            return '\0' as u8;
+        }
+        self.source[self.current + 1]
+    }
+
+    fn is_digit(&self, c: u8) -> bool {
+        c.is_ascii_digit()
+    }
+
+    fn number(&mut self) {
+        while self.is_digit(self.peek()) {
+            self.advance();
+        }
+
+        if self.peek() == b'.' && self.is_digit(self.peek_next()) {
+            // consume the '.'
+            self.advance();
+
+            while self.is_digit(self.peek()) {
+                self.advance();
+            }
+        }
+
+        let value = str::from_utf8(&self.source[self.start..self.current]).expect("Invalid UTF-8");
+        self.add_token(TokenType::Number, Some(String::from(value)));
     }
 
     fn string(&mut self) -> Result<(), Box<dyn Error>> {
-        while self.peek() != &('"' as u8) && !self.is_at_end() {
-            if self.peek() == &('\n' as u8) {
+        while self.peek() != b'"' && !self.is_at_end() {
+            if self.peek() == b'\n' {
                 self.line += 1;
             }
             self.advance();
@@ -128,7 +157,7 @@ impl<'a> Scanner<'a> {
             ' ' | '\t' | '\r' => (),
             '/' => {
                 if self.match_next('/') {
-                    while self.peek() != &('\n' as u8) && !self.is_at_end() {
+                    while self.peek() != '\n' as u8 && !self.is_at_end() {
                         self.advance();
                     }
                 } else {
@@ -136,6 +165,7 @@ impl<'a> Scanner<'a> {
                 }
             }
             '"' => self.string()?,
+            '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => self.number(),
             _ => println!("Unexpected character on line {}", self.line),
         }
         Ok(())
