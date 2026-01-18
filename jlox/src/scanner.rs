@@ -67,17 +67,18 @@ impl<'a> Scanner<'a> {
         c.is_ascii_digit()
     }
 
-    fn identifier(&mut self) {
+    fn identifier(&mut self) -> Result<(), Box<dyn Error>> {
         while self.peek().is_ascii_alphanumeric() || self.peek() == b'_' {
             self.advance();
         }
 
         let raw = &self.source[self.start..self.current];
-        let token_type = TokenType::identifier(str::from_utf8(raw).expect("Invalid UTF-8"));
+        let token_type = TokenType::identifier(str::from_utf8(raw)?);
         self.add_token(token_type, None);
+        Ok(())
     }
 
-    fn number(&mut self) {
+    fn number(&mut self) -> Result<(), Box<dyn Error>> {
         while self.is_digit(self.peek()) {
             self.advance();
         }
@@ -91,8 +92,9 @@ impl<'a> Scanner<'a> {
             }
         }
 
-        let value = str::from_utf8(&self.source[self.start..self.current]).expect("Invalid UTF-8");
+        let value = str::from_utf8(&self.source[self.start..self.current])?;
         self.add_token(TokenType::Number, Some(String::from(value)));
+        Ok(())
     }
 
     fn string(&mut self) -> Result<(), Box<dyn Error>> {
@@ -115,7 +117,7 @@ impl<'a> Scanner<'a> {
         let value = &self.source[self.start + 1..self.current - 1];
         self.add_token(
             TokenType::String,
-            Some(String::from(str::from_utf8(value).expect("Invalid UTF-8"))),
+            Some(String::from(str::from_utf8(value)?)),
         );
 
         Ok(())
@@ -175,8 +177,8 @@ impl<'a> Scanner<'a> {
                 }
             }
             '"' => self.string()?,
-            '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => self.number(),
-            c if c.is_alphabetic() || c == '_' => self.identifier(),
+            '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => self.number()?,
+            c if c.is_alphabetic() || c == '_' => self.identifier()?,
             _ => println!("Unexpected character on line {}", self.line),
         }
         Ok(())
