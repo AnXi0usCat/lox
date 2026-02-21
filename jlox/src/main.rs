@@ -8,7 +8,7 @@ use std::{
 use jlox::scanner::Scanner;
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
+    let args: Vec<String> = env::args().skip(1).collect();
 
     if args.len() > 1 {
         eprintln!("Usage: jlox [script]");
