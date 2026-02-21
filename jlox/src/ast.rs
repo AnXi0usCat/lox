@@ -1,5 +1,6 @@
 use std::fmt;
 
+use crate::token::Token;
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum Infix {
@@ -30,20 +31,19 @@ impl fmt::Display for Infix {
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub enum Expression {
-    Binary(Box<Expression>, Infix, Box<Expression>),
-    Unary(Infix, Box<Expression>),
-    Grouping(Box<Expression>),
+pub enum Expression<'a> {
+    Binary(Box<Expression<'a>>, Token<'a>, Box<Expression<'a>>),
+    Unary(Token<'a>, Box<Expression<'a>>),
+    Grouping(Box<Expression<'a>>),
     NumberLiteral(f64),
-    StringLiteral(String)
+    StringLiteral(String),
 }
 
-
-impl fmt::Display for Expression {
+impl<'a> fmt::Display for Expression<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let _ = match self {
-            Self::Binary(exp1, op, exp2) => write!(f, "({} {} {})", exp1, op, exp2),
-            Self::Unary(op, exp) => write!(f, "({} {})", op, exp),
+            Self::Binary(exp1, op, exp2) => write!(f, "({} {} {})", String::from_utf8_lossy(op.lexeme), exp1, exp2),
+            Self::Unary(op, exp) => write!(f, "({} {})", String::from_utf8_lossy(op.lexeme), exp),
             Self::Grouping(exp) => write!(f, "(group {})", exp),
             Self::NumberLiteral(num) => write!(f, "{}", num),
             Self::StringLiteral(string) => write!(f, "\"{}\"", string),
